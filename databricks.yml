@@ -1,0 +1,36 @@
+# Databricks Asset Bundle - ETL Pipeline Project
+bundle:
+  name: databricks-etl-pipeline
+
+# Variables globales
+variables:
+  catalog:
+    default: datasets_github_projects
+  schema:
+    default: default
+
+# Recursos del proyecto
+resources:
+  jobs:
+    etl_pipeline_job:
+      name: "[${bundle.target}] ETL Pipeline"
+      
+      tasks:
+        - task_key: etl_transform
+          notebook_task:
+            notebook_path: ./resources/notebooks/etl_pipeline.ipynb
+            source: WORKSPACE
+          
+          # Serverless compute (sin definir cluster)
+            
+      # Ejecución manual por ahora
+      max_concurrent_runs: 1
+
+# Entornos
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-70b3e9fc-520b.cloud.databricks.com
+      root_path: /Users/msosa@unal.edu.co/.bundle/${bundle.name}/${bundle.target}

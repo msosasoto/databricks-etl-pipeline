@@ -6,6 +6,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 *.egg-info/
 dist/
@@ -27,3 +28,6 @@ data/processed/*.parquet
 # OS
 .DS_Store
 Thumbs.db
+
+# Carpetas vacías no necesarias
+databricks-sync/
