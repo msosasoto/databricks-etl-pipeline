@@ -137,7 +137,7 @@ Los cambios en `resources/notebooks/etl_pipeline.ipynb` se sincronizan automáti
 
 **Mariano Sosa**  
 Ingeniero de Datos  
-Stack: Python | PySpark | Azure | Databricks | Docker
+Stack: Python | PySpark | Databricks
 
 ---
 
