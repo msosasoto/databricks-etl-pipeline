@@ -31,7 +31,7 @@ class JsonFormatter(logging.Formatter):
             "message": record.getMessage(),
             "module": record.module,
             "function": record.funcName,
-            "line": record.lineno
+            "line": record.lineno,
         }
 
         # Add exception info if present
@@ -49,7 +49,7 @@ def setup_logger(
     name: str = "etl_pipeline",
     level: str = "INFO",
     use_json: bool = False,
-    log_file: Optional[str] = None
+    log_file: Optional[str] = None,
 ) -> logging.Logger:
     """
     Set up and configure logger.
@@ -82,8 +82,7 @@ def setup_logger(
         formatter = JsonFormatter()
     else:
         formatter = logging.Formatter(
-            fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
+            fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
         )
 
     console_handler.setFormatter(formatter)

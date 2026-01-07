@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 class DataLoadError(Exception):
     """Custom exception for data loading errors."""
+
     pass
 
 
@@ -49,25 +50,25 @@ class DataLoader:
             >>> df = loader.load_source_data()
         """
         table_name = self.config.source_table_full
-        
+
         try:
             logger.info(f"Loading data from: {table_name}")
-            
+
             # Check if table exists
             if not check_table_exists(self.spark, table_name):
                 raise DataLoadError(f"Source table does not exist: {table_name}")
-            
+
             # Load data
             df = self.spark.table(table_name)
             row_count = df.count()
-            
+
             logger.info(f"Successfully loaded {row_count} records from {table_name}")
-            
+
             # Log schema info
             logger.debug(f"Schema columns: {df.columns}")
-            
+
             return df
-            
+
         except DataLoadError:
             raise
         except Exception as e:
@@ -94,18 +95,18 @@ class DataLoader:
         """
         try:
             logger.info(f"Loading data from custom table: {table_name}")
-            
+
             # Check if table exists
             if not check_table_exists(self.spark, table_name):
                 raise DataLoadError(f"Table does not exist: {table_name}")
-            
+
             # Load data
             df = self.spark.table(table_name)
             row_count = df.count()
-            
+
             logger.info(f"Successfully loaded {row_count} records from {table_name}")
             return df
-            
+
         except DataLoadError:
             raise
         except Exception as e:
@@ -113,11 +114,7 @@ class DataLoader:
             logger.error(error_msg)
             raise DataLoadError(error_msg) from e
 
-    def validate_schema(
-        self,
-        df: DataFrame,
-        required_columns: list
-    ) -> bool:
+    def validate_schema(self, df: DataFrame, required_columns: list) -> bool:
         """
         Validate that DataFrame contains required columns.
 
@@ -137,11 +134,11 @@ class DataLoader:
         df_columns = set(df.columns)
         required_set = set(required_columns)
         missing_columns = required_set - df_columns
-        
+
         if missing_columns:
             error_msg = f"Missing required columns: {missing_columns}"
             logger.error(error_msg)
             raise DataLoadError(error_msg)
-        
+
         logger.info("Schema validation passed")
         return True

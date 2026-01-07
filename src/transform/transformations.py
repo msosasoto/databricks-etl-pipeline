@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class TransformationError(Exception):
     """Custom exception for transformation errors."""
+
     pass
 
 
@@ -52,10 +53,10 @@ class SalesTransformer:
         """
         try:
             logger.info("Starting data transformations")
-            
+
             # Validate input
             self._validate_input(df)
-            
+
             # Apply transformations
             df_transformed = df
             df_transformed = self._add_total_amount(df_transformed)
@@ -63,10 +64,10 @@ class SalesTransformer:
             df_transformed = self._add_order_size_classification(df_transformed)
             df_transformed = self._add_price_category(df_transformed)
             df_transformed = self._add_processing_timestamp(df_transformed)
-            
+
             logger.info(f"Transformations completed. Output columns: {df_transformed.columns}")
             return df_transformed
-            
+
         except Exception as e:
             error_msg = f"Transformation failed: {str(e)}"
             logger.error(error_msg)
@@ -84,12 +85,12 @@ class SalesTransformer:
         """
         required_columns = ["order_id", "quantity", "price", "order_date"]
         missing_columns = set(required_columns) - set(df.columns)
-        
+
         if missing_columns:
             raise TransformationError(
                 f"Missing required columns for transformation: {missing_columns}"
             )
-        
+
         logger.debug("Input validation passed")
 
     def _add_total_amount(self, df: DataFrame) -> DataFrame:
@@ -104,8 +105,7 @@ class SalesTransformer:
         """
         logger.debug("Adding total_amount column")
         return df.withColumn(
-            "total_amount",
-            (F.col("quantity") * F.col("price")).cast(DoubleType())
+            "total_amount", (F.col("quantity") * F.col("price")).cast(DoubleType())
         )
 
     def _add_date_components(self, df: DataFrame) -> DataFrame:
@@ -119,10 +119,11 @@ class SalesTransformer:
             DataFrame with date component columns.
         """
         logger.debug("Adding date component columns")
-        return df \
-            .withColumn("year", F.year("order_date")) \
-            .withColumn("month", F.month("order_date")) \
+        return (
+            df.withColumn("year", F.year("order_date"))
+            .withColumn("month", F.month("order_date"))
             .withColumn("day_of_week", F.dayofweek("order_date"))
+        )
 
     def _add_order_size_classification(self, df: DataFrame) -> DataFrame:
         """
@@ -135,15 +136,15 @@ class SalesTransformer:
             DataFrame with order_size column.
         """
         logger.debug("Adding order_size classification")
-        
+
         large_threshold = self.config.order_size_large_threshold
         medium_threshold = self.config.order_size_medium_threshold
-        
+
         return df.withColumn(
             "order_size",
             F.when(F.col("quantity") >= large_threshold, "Large")
             .when(F.col("quantity") >= medium_threshold, "Medium")
-            .otherwise("Small")
+            .otherwise("Small"),
         )
 
     def _add_price_category(self, df: DataFrame) -> DataFrame:
@@ -157,15 +158,15 @@ class SalesTransformer:
             DataFrame with price_category column.
         """
         logger.debug("Adding price_category column")
-        
+
         premium_threshold = self.config.price_premium_threshold
         standard_threshold = self.config.price_standard_threshold
-        
+
         return df.withColumn(
             "price_category",
             F.when(F.col("price") >= premium_threshold, "Premium")
             .when(F.col("price") >= standard_threshold, "Standard")
-            .otherwise("Budget")
+            .otherwise("Budget"),
         )
 
     def _add_processing_timestamp(self, df: DataFrame) -> DataFrame:
@@ -179,10 +180,7 @@ class SalesTransformer:
             DataFrame with processed_at column.
         """
         logger.debug("Adding processing timestamp")
-        return df.withColumn(
-            "processed_at",
-            F.lit(datetime.now()).cast("timestamp")
-        )
+        return df.withColumn("processed_at", F.lit(datetime.now()).cast("timestamp"))
 
     def calculate_total_amount(self, quantity: float, price: float) -> float:
         """

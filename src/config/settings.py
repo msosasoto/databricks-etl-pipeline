@@ -38,7 +38,7 @@ class Config:
     def _load_config(self) -> None:
         """Load configuration from YAML file and apply environment variables."""
         if self.config_path.exists():
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path, "r") as f:
                 self._config = yaml.safe_load(f) or {}
         else:
             # Use default configuration if file doesn't exist
@@ -69,32 +69,21 @@ class Config:
             Default configuration dictionary.
         """
         return {
-            "spark": {
-                "app_name": "ETL Pipeline"
-            },
+            "spark": {"app_name": "ETL Pipeline"},
             "catalog": {
                 "name": os.getenv("CATALOG_NAME", "datasets_github_projects"),
-                "schema": os.getenv("SCHEMA_NAME", "default")
+                "schema": os.getenv("SCHEMA_NAME", "default"),
             },
-            "tables": {
-                "source": "ventas_raw",
-                "target": "ventas_transformed"
-            },
+            "tables": {"source": "ventas_raw", "target": "ventas_transformed"},
             "business_rules": {
-                "order_size": {
-                    "large_threshold": 10,
-                    "medium_threshold": 5
-                },
-                "price_category": {
-                    "premium_threshold": 500,
-                    "standard_threshold": 100
-                }
+                "order_size": {"large_threshold": 10, "medium_threshold": 5},
+                "price_category": {"premium_threshold": 500, "standard_threshold": 100},
             },
             "data_quality": {
                 "max_null_percentage": 5,
                 "check_duplicates": True,
-                "validate_negative_values": True
-            }
+                "validate_negative_values": True,
+            },
         }
 
     def get(self, key: str, default: Any = None) -> Any:
@@ -108,7 +97,7 @@ class Config:
         Returns:
             Configuration value.
         """
-        keys = key.split('.')
+        keys = key.split(".")
         value = self._config
         for k in keys:
             if isinstance(value, dict):

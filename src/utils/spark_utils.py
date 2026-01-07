@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_spark_session(
-    app_name: str = "ETL Pipeline",
-    config: Optional[Dict[str, Any]] = None
+    app_name: str = "ETL Pipeline", config: Optional[Dict[str, Any]] = None
 ) -> SparkSession:
     """
     Get or create Spark session with Delta Lake support.
@@ -31,13 +30,9 @@ def get_spark_session(
     builder = SparkSession.builder.appName(app_name)
 
     # Add Delta Lake support
+    builder = builder.config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
     builder = builder.config(
-        "spark.sql.extensions",
-        "io.delta.sql.DeltaSparkSessionExtension"
-    )
-    builder = builder.config(
-        "spark.sql.catalog.spark_catalog",
-        "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        "spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog"
     )
 
     # Add additional config if provided
@@ -56,9 +51,7 @@ def get_spark_session(
 
 
 def optimize_delta_table(
-    spark: SparkSession,
-    table_name: str,
-    zorder_columns: Optional[list] = None
+    spark: SparkSession, table_name: str, zorder_columns: Optional[list] = None
 ) -> None:
     """
     Optimize Delta table with optional Z-ordering.
@@ -73,7 +66,7 @@ def optimize_delta_table(
     """
     try:
         logger.info(f"Optimizing Delta table: {table_name}")
-        
+
         if zorder_columns:
             zorder_clause = ", ".join(zorder_columns)
             spark.sql(f"OPTIMIZE {table_name} ZORDER BY ({zorder_clause})")
@@ -81,17 +74,13 @@ def optimize_delta_table(
         else:
             spark.sql(f"OPTIMIZE {table_name}")
             logger.info("Table optimized without Z-ordering")
-            
+
     except Exception as e:
         logger.error(f"Failed to optimize table {table_name}: {str(e)}")
         raise
 
 
-def vacuum_delta_table(
-    spark: SparkSession,
-    table_name: str,
-    retention_hours: int = 168
-) -> None:
+def vacuum_delta_table(spark: SparkSession, table_name: str, retention_hours: int = 168) -> None:
     """
     Vacuum Delta table to remove old files.
 
@@ -131,17 +120,17 @@ def get_table_stats(spark: SparkSession, table_name: str) -> Dict[str, Any]:
         df = spark.table(table_name)
         row_count = df.count()
         column_count = len(df.columns)
-        
+
         stats = {
             "table_name": table_name,
             "row_count": row_count,
             "column_count": column_count,
-            "columns": df.columns
+            "columns": df.columns,
         }
-        
+
         logger.info(f"Table stats retrieved: {row_count} rows, {column_count} columns")
         return stats
-        
+
     except Exception as e:
         logger.error(f"Failed to get stats for table {table_name}: {str(e)}")
         raise
