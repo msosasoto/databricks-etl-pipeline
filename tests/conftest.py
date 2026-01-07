@@ -25,11 +25,6 @@ def spark():
         SparkSession.builder
         .master("local[2]")
         .appName("ETL-Pipeline-Tests")
-        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-        .config(
-            "spark.sql.catalog.spark_catalog",
-            "org.apache.spark.sql.delta.catalog.DeltaCatalog"
-        )
         .config("spark.sql.warehouse.dir", "/tmp/spark-warehouse")
         .getOrCreate()
     )
@@ -60,9 +55,9 @@ def sample_sales_schema():
     """
     return StructType([
         StructField("order_id", IntegerType(), False),
-        StructField("customer_id", StringType(), False),
-        StructField("product_name", StringType(), False),
-        StructField("category", StringType(), False),
+        StructField("customer_id", StringType(), True),  # Allow nulls for testing
+        StructField("product_name", StringType(), True),  # Allow nulls for testing
+        StructField("category", StringType(), True),  # Allow nulls for testing
         StructField("quantity", IntegerType(), False),
         StructField("price", DoubleType(), False),
         StructField("order_date", DateType(), False),
