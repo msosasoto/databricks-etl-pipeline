@@ -6,18 +6,18 @@
 
 Production-ready ETL pipeline for processing sales data using PySpark and Delta Lake on Databricks, with comprehensive testing, data quality validation, and automated deployment.
 
-## ✨ Features
+##  Features
 
-- 🏗️ **Modular Architecture**: Clean separation of concerns with dedicated modules
-- 🛡️ **Error Handling**: Custom exceptions and comprehensive error management
-- 📝 **Structured Logging**: JSON-formatted logs with contextual information
-- ✅ **Data Quality**: Automated validation checks for nulls, negatives, duplicates
-- 🔄 **Incremental Loads**: Delta merge (upsert) support for efficient updates
-- 🔐 **Secure Configuration**: Environment-based config with no hardcoded secrets
-- 🧪 **Well Tested**: 33 unit/integration tests with 61% coverage
-- 🚀 **CI/CD Ready**: GitHub Actions pipeline for automated testing
+-  **Modular Architecture**: Clean separation of concerns with dedicated modules
+-  **Error Handling**: Custom exceptions and comprehensive error management
+-  **Structured Logging**: JSON-formatted logs with contextual information
+-  **Data Quality**: Automated validation checks for nulls, negatives, duplicates
+-  **Incremental Loads**: Delta merge (upsert) support for efficient updates
+-  **Secure Configuration**: Environment-based config with no hardcoded secrets
+-  **Well Tested**: 33 unit/integration tests with 61% coverage
+-  **CI/CD Ready**: GitHub Actions pipeline for automated testing
 
-## 📊 Pipeline Overview
+##  Pipeline Overview
 
 ```
 Source Data (Delta) → Extract → Validate → Transform → Load → Target (Delta)
@@ -26,19 +26,19 @@ Source Data (Delta) → Extract → Validate → Transform → Load → Target (
 ```
 
 ### Transformations Applied
-- ✅ Calculate total amount (`quantity × price`)
-- ✅ Extract temporal components (year, month, day of week)
-- ✅ Classify orders by size (Small/Medium/Large)
-- ✅ Categorize by price (Budget/Standard/Premium)
-- ✅ Add processing timestamps
+-  Calculate total amount (`quantity × price`)
+-  Extract temporal components (year, month, day of week)
+-  Classify orders by size (Small/Medium/Large)
+-  Categorize by price (Budget/Standard/Premium)
+-  Add processing timestamps
 
 ### Data Quality Checks
-- 📈 Null value validation (configurable threshold)
-- 💰 Negative value detection (prices, quantities)
-- 🔍 Duplicate order ID detection
-- 📅 Date range validation
+-  Null value validation (configurable threshold)
+-  Negative value detection (prices, quantities)
+-  Duplicate order ID detection
+-  Date range validation
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 databricks-etl-pipeline/
@@ -125,7 +125,7 @@ databricks-etl-pipeline/
    - Find `[dev] ETL Pipeline`
    - Click **Run Now**
 
-## 🧪 Development
+##  Development
 
 ### Running Tests
 
@@ -209,12 +209,12 @@ SCHEMA_NAME=default
 LOG_LEVEL=INFO
 ```
 
-## 📚 Documentation
+##  Documentation
 
 - **[Architecture](docs/architecture.md)**: System design and technical details
 - **[Deployment](docs/deployment.md)**: Complete deployment guide
 
-## 🧩 Key Components
+##  Key Components
 
 ### Data Loader
 ```python
@@ -249,7 +249,7 @@ writer = DeltaWriter(spark, config)
 stats = writer.upsert(df_transformed, merge_key="order_id")
 ```
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
@@ -261,7 +261,7 @@ stats = writer.upsert(df_transformed, merge_key="order_id")
 | **Black** | 23.12.1 | Code formatting |
 | **Flake8** | 7.0.0 | Linting |
 
-## 📈 Test Coverage
+##  Test Coverage
 
 | Module | Coverage |
 |--------|----------|
@@ -270,7 +270,7 @@ stats = writer.upsert(df_transformed, merge_key="order_id")
 | `settings.py` | 86% |
 | **Overall** | **61%** |
 
-## 🎯 Example Results
+##  Example Results
 
 ### Input Data (10 records)
 ```
@@ -295,7 +295,7 @@ order_id | total_amount | order_size | price_category | year | month | ...
 - **Average Ticket**: $365.49
 - **Top Category**: Electronics (60%)
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -305,11 +305,11 @@ order_id | total_amount | order_size | price_category | year | month | ...
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
 
-## 📝 License
+##  License
 
 This project is part of a data engineering portfolio.
 
-## 👤 Author
+##  Author
 
 **Mariano Sosa**  
 Data Engineer  
@@ -317,4 +317,4 @@ Stack: Python | PySpark | Databricks | Delta Lake
 
 ---
 
-📝 *This is Project #1 of a series of incremental data engineering projects focusing on production-ready practices.*
+ *This is Project #1 of a series of incremental data engineering projects focusing on production-ready practices.*
