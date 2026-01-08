@@ -1,144 +1,320 @@
 # Databricks ETL Pipeline
 
-Pipeline ETL básico para procesar datos de ventas usando PySpark y Delta Lake en Databricks, con deployment automatizado mediante Databricks Asset Bundles.
+[![CI Pipeline](https://github.com/msosasoto/databricks-etl-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/msosasoto/databricks-etl-pipeline/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-## 📊 Descripción del Proyecto
+Production-ready ETL pipeline for processing sales data using PySpark and Delta Lake on Databricks, with comprehensive testing, data quality validation, and automated deployment.
 
-Este proyecto implementa un pipeline de datos end-to-end que:
-- **Ingesta** datos de ventas desde una tabla Delta
-- **Transforma** los datos aplicando lógica de negocio
-- **Carga** resultados en una tabla Delta optimizada
+## ✨ Features
 
-### Transformaciones aplicadas
-- ✅ Cálculo de monto total por orden (`quantity × price`)
-- ✅ Extracción de componentes temporales (año, mes, día de la semana)
-- ✅ Clasificación de órdenes por volumen (Small/Medium/Large)
-- ✅ Categorización por precio (Budget/Standard/Premium)
-- ✅ Registro de timestamp de procesamiento
+- 🏗️ **Modular Architecture**: Clean separation of concerns with dedicated modules
+- 🛡️ **Error Handling**: Custom exceptions and comprehensive error management
+- 📝 **Structured Logging**: JSON-formatted logs with contextual information
+- ✅ **Data Quality**: Automated validation checks for nulls, negatives, duplicates
+- 🔄 **Incremental Loads**: Delta merge (upsert) support for efficient updates
+- 🔐 **Secure Configuration**: Environment-based config with no hardcoded secrets
+- 🧪 **Well Tested**: 33 unit/integration tests with 61% coverage
+- 🚀 **CI/CD Ready**: GitHub Actions pipeline for automated testing
 
-### Métricas generadas
-- 📈 Ventas totales por país
-- 📦 Ventas por categoría de producto
-- 💰 Estadísticas de montos (min, max, avg, total)
+## 📊 Pipeline Overview
 
-## 📁 Estructura del Proyecto
+```
+Source Data (Delta) → Extract → Validate → Transform → Load → Target (Delta)
+                        ↓         ↓          ↓          ↓
+                    DataLoader Quality  Transforms  Upsert/Merge
+```
+
+### Transformations Applied
+- ✅ Calculate total amount (`quantity × price`)
+- ✅ Extract temporal components (year, month, day of week)
+- ✅ Classify orders by size (Small/Medium/Large)
+- ✅ Categorize by price (Budget/Standard/Premium)
+- ✅ Add processing timestamps
+
+### Data Quality Checks
+- 📈 Null value validation (configurable threshold)
+- 💰 Negative value detection (prices, quantities)
+- 🔍 Duplicate order ID detection
+- 📅 Date range validation
+
+## 📁 Project Structure
+
 ```
 databricks-etl-pipeline/
+├── .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI pipeline
+├── config/
+│   └── config.yaml             # Business rules and configuration
 ├── data/
-│   ├── raw/              # Datos fuente (ventas_raw.csv)
-│   └── processed/        # Datos transformados (local)
+│   ├── raw/                    # Source data (CSV)
+│   └── processed/              # Local processed data
+├── docs/
+│   ├── architecture.md         # Architecture documentation
+│   └── deployment.md           # Deployment guide
 ├── resources/
 │   └── notebooks/
-│       └── etl_pipeline.ipynb  # Notebook principal del pipeline
-├── src/                  # Código reutilizable (próximas iteraciones)
-├── tests/                # Pruebas unitarias (próximas iteraciones)
-├── docs/                 # Documentación adicional
-├── databricks.yml        # Configuración del Databricks Asset Bundle
-├── README.md
+│       └── etl_pipeline.ipynb  # Orchestration notebook
+├── src/
+│   ├── config/
+│   │   └── settings.py         # Configuration management
+│   ├── extract/
+│   │   └── data_loader.py      # Data extraction
+│   ├── transform/
+│   │   └── transformations.py  # Business logic
+│   ├── validation/
+│   │   └── data_quality.py     # Quality checks
+│   ├── load/
+│   │   └── data_writer.py      # Delta merge/upsert
+│   └── utils/
+│       ├── logger.py            # Structured logging
+│       └── spark_utils.py       # Spark utilities
+├── tests/
+│   ├── conftest.py             # Pytest fixtures
+│   ├── test_transformations.py # Transformation tests
+│   ├── test_data_quality.py    # Quality tests
+│   └── test_integration.py     # Integration tests
+├── .env.example                # Environment variables template
 ├── .gitignore
-└── requirements.txt
+├── databricks.yml              # Databricks Asset Bundle config
+├── requirements.txt            # Production dependencies
+├── requirements-dev.txt        # Development dependencies
+└── README.md
 ```
 
-## 🚀 Cómo Ejecutar
+## 🚀 Quick Start
 
-### Prerrequisitos
-- Cuenta de Databricks (Free Tier o superior)
-- Databricks CLI instalada
-- VS Code con extensión de Databricks
+### Prerequisites
+- Python 3.10+
+- Databricks workspace
+- Databricks CLI installed
 
-### Setup inicial
+### Installation
 
-1. **Clonar el repositorio**:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/msosasoto/databricks-etl-pipeline.git
+   cd databricks-etl-pipeline
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configure environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Databricks settings
+   ```
+
+4. **Authenticate with Databricks**
+   ```bash
+   databricks auth login --host <YOUR_WORKSPACE_URL>
+   ```
+
+5. **Deploy to Databricks**
+   ```bash
+   databricks bundle validate
+   databricks bundle deploy --target dev
+   ```
+
+6. **Run the pipeline**
+   - Go to Databricks workspace → **Workflows**
+   - Find `[dev] ETL Pipeline`
+   - Click **Run Now**
+
+## 🧪 Development
+
+### Running Tests
+
 ```bash
-git clone https://github.com/msosasoto/databricks-etl-pipeline.git
-cd databricks-etl-pipeline
+# Install dev dependencies
+pip install -r requirements-dev.txt
+
+# Run all tests
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ -v --cov=src --cov-report=html
+
+# Run specific test file
+pytest tests/test_transformations.py -v
 ```
 
-2. **Configurar Databricks CLI**:
+### Code Quality
+
 ```bash
-databricks auth login --host <TU_WORKSPACE_URL>
+# Format code
+black src/ tests/
+
+# Lint code
+flake8 src/ tests/
+
+# Type checking
+mypy src/
 ```
 
-3. **Subir datos iniciales**:
-   - Cargar `data/raw/ventas_raw.csv` a Databricks como tabla Delta
-   - Catálogo: `datasets_github_projects`
-   - Schema: `default`
-   - Tabla: `ventas_raw`
+### Local Development
 
-### Desarrollo y Deployment
+```python
+# Example: Using the pipeline components
+from src.config.settings import Config
+from src.extract.data_loader import DataLoader
+from src.transform.transformations import SalesTransformer
+from src.validation.data_quality import DataQualityValidator
 
-1. **Editar el notebook localmente** en VS Code:
-```bash
-code resources/notebooks/etl_pipeline.ipynb
+# Initialize
+config = Config()
+loader = DataLoader(spark, config)
+
+# Extract
+df_raw = loader.load_source_data()
+
+# Validate
+validator = DataQualityValidator(config)
+report = validator.validate(df_raw)
+
+# Transform
+transformer = SalesTransformer(config)
+df_transformed = transformer.transform(df_raw)
 ```
 
-2. **Validar configuración**:
-```bash
-databricks bundle validate
+## ⚙️ Configuration
+
+### Business Rules (`config/config.yaml`)
+
+```yaml
+business_rules:
+  order_size:
+    large_threshold: 10      # Orders with quantity >= 10
+    medium_threshold: 5      # Orders with quantity >= 5
+  price_category:
+    premium_threshold: 500   # Prices >= 500
+    standard_threshold: 100  # Prices >= 100
+    
+data_quality:
+  max_null_percentage: 5     # Max % nulls allowed
+  check_duplicates: true
+  validate_negative_values: true
 ```
 
-3. **Deployar a Databricks**:
-```bash
-databricks bundle deploy
+### Environment Variables (`.env`)
+
+```env
+DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
+CATALOG_NAME=datasets_github_projects
+SCHEMA_NAME=default
+LOG_LEVEL=INFO
 ```
 
-4. **Ejecutar el Job** desde Databricks Web:
-   - Ve a **Workflows** → `[dev] ETL Pipeline`
-   - Clic en **Run Now**
+## 📚 Documentation
 
-### Tablas generadas
-- 📥 **Entrada**: `datasets_github_projects.default.ventas_raw`
-- 📤 **Salida**: `datasets_github_projects.default.ventas_transformed`
+- **[Architecture](docs/architecture.md)**: System design and technical details
+- **[Deployment](docs/deployment.md)**: Complete deployment guide
 
-## 🛠️ Stack Tecnológico
+## 🧩 Key Components
 
-| Herramienta | Versión | Propósito |
-|------------|---------|-----------|
-| **Databricks** | Free Tier | Plataforma de procesamiento |
-| **PySpark** | 3.5+ | Motor de transformaciones |
-| **Delta Lake** | 3.0+ | Almacenamiento transaccional |
-| **Python** | 3.10+ | Lenguaje base |
-| **Databricks CLI** | 0.275+ | Deployment automatizado |
-| **Databricks Asset Bundles** | - | Infraestructura como código |
+### Data Loader
+```python
+from src.extract.data_loader import DataLoader
 
-## 📊 Resultados
-
-### Dataset Original
-- 10 registros de ventas
-- 8 columnas
-- Rango: 2024-01-15 a 2024-01-19
-
-### Dataset Transformado
-- 10 registros enriquecidos
-- 15 columnas (7 nuevas columnas calculadas)
-- Formato: Delta Lake con versionamiento
-
-### Métricas de Negocio
-- **Revenue total**: $3,654.88
-- **Ticket promedio**: $365.49
-- **Categoría top**: Electronics (60% de órdenes)
-
-## 🔄 Flujo de Desarrollo
-```
-Editar en VS Code → databricks bundle deploy → Ejecutar en Databricks
+loader = DataLoader(spark, config)
+df = loader.load_source_data()
 ```
 
-Los cambios en `resources/notebooks/etl_pipeline.ipynb` se sincronizan automáticamente con el workspace de Databricks mediante el Bundle.
+### Transformations
+```python
+from src.transform.transformations import SalesTransformer
 
-## 🎯 Próximos Pasos
+transformer = SalesTransformer(config)
+df_transformed = transformer.transform(df_raw)
+```
 
-- [ ] Implementar pruebas unitarias con pytest
-- [ ] Agregar validación de calidad de datos
-- [ ] Crear pipeline orquestado con Databricks Workflows
-- [ ] Implementar CI/CD con GitHub Actions
-- [ ] Añadir logging estructurado
+### Data Quality
+```python
+from src.validation.data_quality import DataQualityValidator
 
-## 👤 Autor
+validator = DataQualityValidator(config)
+report = validator.validate(df)
+print(validator.generate_quality_report(report))
+```
+
+### Delta Writer (Upsert)
+```python
+from src.load.data_writer import DeltaWriter
+
+writer = DeltaWriter(spark, config)
+stats = writer.upsert(df_transformed, merge_key="order_id")
+```
+
+## 🛠️ Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Python** | 3.10+ | Programming language |
+| **PySpark** | 3.5.0 | Data processing engine |
+| **Delta Lake** | 3.0.0 | Storage layer |
+| **Databricks** | - | Cloud platform |
+| **PyTest** | 7.4.3 | Testing framework |
+| **Black** | 23.12.1 | Code formatting |
+| **Flake8** | 7.0.0 | Linting |
+
+## 📈 Test Coverage
+
+| Module | Coverage |
+|--------|----------|
+| `transformations.py` | 100% |
+| `data_quality.py` | 92% |
+| `settings.py` | 86% |
+| **Overall** | **61%** |
+
+## 🎯 Example Results
+
+### Input Data (10 records)
+```
+order_id | customer_id | product_name | quantity | price  | country
+---------|-------------|--------------|----------|--------|----------
+1001     | C001        | Laptop       | 1        | 1200.5 | Colombia
+1002     | C002        | Mouse        | 2        | 25.99  | Mexico
+...
+```
+
+### Output Data (10 records + 7 new columns)
+```
+order_id | total_amount | order_size | price_category | year | month | ...
+---------|--------------|------------|----------------|------|-------|----
+1001     | 1200.50      | Small      | Premium        | 2024 | 1     | ...
+1002     | 51.98        | Small      | Budget         | 2024 | 1     | ...
+...
+```
+
+### Business Metrics
+- **Total Revenue**: $3,654.88
+- **Average Ticket**: $365.49
+- **Top Category**: Electronics (60%)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`pytest tests/ -v`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## 📝 License
+
+This project is part of a data engineering portfolio.
+
+## 👤 Author
 
 **Mariano Sosa**  
-Ingeniero de Datos  
-Stack: Python | PySpark | Databricks
+Data Engineer  
+Stack: Python | PySpark | Databricks | Delta Lake
 
 ---
 
-📝 *Este es el Proyecto #1 de una serie de proyectos incrementales en ingeniería de datos*
+📝 *This is Project #1 of a series of incremental data engineering projects focusing on production-ready practices.*

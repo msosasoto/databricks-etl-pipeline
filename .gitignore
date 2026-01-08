@@ -15,19 +15,30 @@ build/
 # Databricks
 .databricks/
 *.dbc
+*.log
 
 # Data
 data/raw/*.csv
 data/processed/*.parquet
-*.log
+data/processed/*
+!data/processed/.gitkeep
 
 # IDE
 .vscode/
 .idea/
+*.swp
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment
+.env
 
 # Carpetas vacías no necesarias
 databricks-sync/

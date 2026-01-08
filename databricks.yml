@@ -32,5 +32,5 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://dbc-70b3e9fc-520b.cloud.databricks.com
-      root_path: /Users/msosa@unal.edu.co/.bundle/${bundle.name}/${bundle.target}
+      host: ${DATABRICKS_HOST}
+      root_path: /.bundle/${bundle.name}/${bundle.target}
